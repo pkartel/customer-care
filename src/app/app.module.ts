@@ -20,6 +20,8 @@ import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatSelectModule } from "@angular/material/select";
 import { TicketNotFoundComponent } from './ticket-not-found/ticket-not-found.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MessageInputComponent } from './message-input/message-input.component';
+
 
 @NgModule({
   declarations: [
@@ -28,6 +30,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     TicketsListComponent,
     TicketComponent,
     TicketNotFoundComponent,
+    MessageInputComponent
   ],
   imports: [
     BrowserModule,

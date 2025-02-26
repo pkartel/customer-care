@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { TicketsService } from '../api/tickets.service';
-import { Ticket } from '../api/Message';
+import { Ticket } from '../api/types';
 import { concat, map, Observable, race, switchMap } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
 

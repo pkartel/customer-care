@@ -1,58 +1,49 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { TicketsService } from '../api/tickets.service';
-import { Message, Ticket } from '../api/Message';
+import { Message, Ticket } from '../api/types';
 import { catchError, Observable, switchMap, tap } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { FormBuilder, Validators } from '@angular/forms';
+import { MessageInputComponent } from '../message-input/message-input.component';
 
 @Component({
   selector: 'app-ticket',
   templateUrl: './ticket.component.html',
-  styleUrls: ['./ticket.component.scss']
+  styleUrls: ['./ticket.component.scss'],
 })
-export class TicketComponent implements OnInit {
+export class TicketComponent {
   _ticketId = 0;
   ticket$ = new Observable<Ticket>();
   messages$ = new Observable<Message[]>();
-  messageForm = this.fb.group({
-    text: this.fb.control('', [Validators.required]),
-  });
 
   @Input()
   set ticketId(ticketId: number) {
     this._ticketId = ticketId;
-    this.ticket$ = this.api.getTicket(this._ticketId).pipe(
-      tap(ticket => {
-        if (ticket.status === "resolved") {
-          this.messageForm.disable();
-        } else {
-          this.messageForm.enable();
-        }
-      })
-    );
+    this.ticket$ = this.api.getTicket(this._ticketId);
+
     this.messages$ = this.ticket$.pipe(
       switchMap(({ id }) => this.api.getTicketMessages(id)),
-      catchError((err, caught) => {
+      catchError((_err, caught) => {
         this.router.navigate(["home", "tickets", "not-found"]);
         return caught;
       }),
     )
-    this.messageForm.reset();
+
+    this.messageInputComponent?.resetMessage();
   }
+
   get ticketId() {
     return this._ticketId;
   }
+
+  @ViewChild(MessageInputComponent)
+  private messageInputComponent!: MessageInputComponent 
 
   constructor(
     private api: TicketsService,
     private snackBar: MatSnackBar,
     private router: Router,
-    private fb: FormBuilder,
   ) { }
-
-  ngOnInit(): void {
-  }
 
   trackByItems(index: number, item: Message): number {
     return item.id;
@@ -65,10 +56,9 @@ export class TicketComponent implements OnInit {
     });
   }
 
-  sendMessage() {
-    const { text } = this.messageForm.value;
+  sendMessage(text: string) {
     const senderType = "operator", senderId = "operator1";
-    this.api.addMessageToTicket(this._ticketId, { text: text!, senderType, senderId }).subscribe(message => {
+    this.api.addMessageToTicket(this._ticketId, { text: text!, senderType, senderId }).subscribe(_message => {
       this.ticketId = this._ticketId;
       this.snackBar.open("Message sent", "Close", { duration: 3000 });
     });

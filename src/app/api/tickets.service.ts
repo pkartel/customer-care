@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { map } from 'rxjs';
-import { Message } from './Message';
+import { BehaviorSubject, filter, map, Observable, of, Subject, tap } from 'rxjs';
+import { Message, Ticket } from './types';
 
 type ApiTicket = {
   id: number;
@@ -24,11 +24,17 @@ type ApiMessage = {
 export class TicketsService {
   private baseUrl = "http://localhost:8000/api/v1"
 
+  private tickets = new BehaviorSubject<Ticket[]>([] as Ticket[])
+
   constructor(
     private http: HttpClient,
   ) { }
 
-  getTickets(status?: "resolved" | "unresolved") {
+  get tickets$(): Observable<Ticket[]> {
+    return this.tickets.asObservable();
+  }
+
+  getTickets(status?: "resolved" | "unresolved"): Observable<Ticket[]> {
     type Body = {
       data: ApiTicket[];
     }
@@ -38,11 +44,16 @@ export class TicketsService {
         ...other,
         createdAt: new Date(createdAt),
       }))),
+        tap((t: Ticket[]) => this.tickets.next(t)),
     );
   }
 
-  getTicket(ticketId: number) {
-    return this.http.get<ApiTicket>(`${this.baseUrl}/tickets/${ticketId}`).pipe(
+  getTicket(ticketId: number): Observable<Ticket> {
+    const existingTicket = this.tickets.value.find(t => t.id === ticketId)
+
+    return existingTicket
+      ? of(existingTicket)
+      : this.http.get<ApiTicket>(`${this.baseUrl}/tickets/${ticketId}`).pipe(
       map(({ createdAt, ...other }) => ({
         ...other,
         createdAt: new Date(createdAt),
