@@ -20,8 +20,11 @@ import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatSelectModule } from "@angular/material/select";
 import { TicketNotFoundComponent } from './ticket-not-found/ticket-not-found.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MessageInputComponent } from './message-input/message-input.component';
-
+import { MessageInputComponent } from './shared/message-input/message-input.component';
+import { MatCheckboxModule } from '@angular/material/checkbox'
+import { BulkTicketsService } from './api/bulk-tickets.service';
+import { BulkTicketsComponent } from './bulk-tickets/bulk-tickets.component';
+import { TicketSummaryComponent } from './shared/ticket-summary/ticket-summary.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +33,9 @@ import { MessageInputComponent } from './message-input/message-input.component';
     TicketsListComponent,
     TicketComponent,
     TicketNotFoundComponent,
-    MessageInputComponent
+    MessageInputComponent,
+    BulkTicketsComponent,
+    TicketSummaryComponent
   ],
   imports: [
     BrowserModule,
@@ -46,10 +51,12 @@ import { MessageInputComponent } from './message-input/message-input.component';
     MatIconModule,
     MatSnackBarModule,
     MatSelectModule,
+    MatCheckboxModule
   ],
   providers: [
     importProvidersFrom(HttpClientModule),
     TicketsService,
+    BulkTicketsService,
   ],
   bootstrap: [AppComponent]
 })

@@ -4,12 +4,12 @@ import { Message, Ticket } from '../api/types';
 import { catchError, Observable, switchMap, tap } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { MessageInputComponent } from '../message-input/message-input.component';
+import { MessageInputComponent } from '../shared/message-input/message-input.component';
 
 @Component({
   selector: 'app-ticket',
   templateUrl: './ticket.component.html',
-  styleUrls: ['./ticket.component.scss'],
+  styleUrls: ['./ticket.component.scss']
 })
 export class TicketComponent {
   _ticketId = 0;

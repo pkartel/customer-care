@@ -1,0 +1,26 @@
+<div class="container">
+  <div class="container-body">
+    <div class="header">
+      <h2>Bulk selection</h2>
+      <button mat-stroked-button [disabled]="true">
+        Resolve all selected tickets
+      </button>
+    </div>
+    <mat-divider></mat-divider>
+    <ng-container *ngIf="(bulk.selectedTickets$ | async)?.length else selectMsg">
+      <div class="ticket-summary">
+        <app-ticket-summary *ngFor="let item of bulk.selectedTickets$ | async"
+          [ticket]="item" 
+          (onTicketResolve)="closeTicket($event)">
+        </app-ticket-summary>
+      </div>
+    </ng-container>
+  </div>
+  <app-message-input
+    (onMessageSubmit)="sendMessage($event)"
+  ></app-message-input>
+</div>
+
+<ng-template #selectMsg>
+  <div class="hint">Select multiple tickets from the list</div>
+</ng-template>

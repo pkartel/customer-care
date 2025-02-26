@@ -12,9 +12,21 @@
   <div id="tickets">
     <mat-nav-list>
       <mat-list-item *ngFor="let item of tickets | async" routerLinkActive="active-link"
-        [routerLink]="['tickets', item.id]">
+        [routerLink]="(isTicketBulkSelected(item) | async) ? ['tickets', 'bulk'] : ['tickets', item.id]"
+        (mouseover)="hoveredTicket = item.id" (mouseleave)="hoveredTicket = null">
         <a matListItemTitle>{{item.subject}}</a>
-        <span matListItemLine>{{item.status}}</span>
+        <span matListItemLine class="ticket-body">
+          {{item.status}}
+          <mat-checkbox *ngIf="item.status === 'unresolved'" 
+            [labelPosition]="'before'"
+            [ariaLabel]="'Bulk select box'"
+            [ngStyle]="{'visibility' : (isTicketBulkSelected(item) | async) || hoveredTicket === item.id ? 'visible' : 'hidden'}"
+            [checked]="isTicketBulkSelected(item) | async"
+            (change)="onTicketSelectChange(item)"
+          >
+            bulk select
+          </mat-checkbox>
+        </span>
       </mat-list-item>
     </mat-nav-list>
   </div>

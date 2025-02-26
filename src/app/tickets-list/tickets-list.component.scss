@@ -20,3 +20,20 @@
 .active-link {
   background-color: rgb(230, 230, 230);
 }
+
+.ticket-body {
+ line-height: 2.5em;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  position: relative;
+
+  mat-checkbox {
+    position: absolute;
+    right: 0;
+
+    &:hover {
+      background-color: none;
+    }
+  }
+}
