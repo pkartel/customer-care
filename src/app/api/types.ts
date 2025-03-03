@@ -12,3 +12,14 @@ export type Message = {
   text: string;
   createdAt: Date;
 };
+
+export type Notification = {
+  progress: number;
+  results: MessageAddStatus[];
+}
+
+export type MessageAddStatus = {
+  error?: any;
+  success: boolean;
+  
+}

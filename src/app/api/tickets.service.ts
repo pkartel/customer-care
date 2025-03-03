@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject, filter, map, Observable, of, Subject, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, tap } from 'rxjs';
 import { Message, Ticket } from './types';
 
 type ApiTicket = {
@@ -10,12 +10,16 @@ type ApiTicket = {
   createdAt: string;
 }
 
-type ApiMessage = {
+export type ApiMessage = {
   id: number;
   senderType: "operator" | "customer";
   senderId: string;
   text: string;
   createdAt: string;
+}
+
+type ApiBatchUpdateRes = {
+  status: 'success' | 'error',
 }
 
 @Injectable({
@@ -27,7 +31,7 @@ export class TicketsService {
   private tickets = new BehaviorSubject<Ticket[]>([] as Ticket[])
 
   constructor(
-    private http: HttpClient,
+    private http: HttpClient
   ) { }
 
   get tickets$(): Observable<Ticket[]> {
@@ -49,7 +53,7 @@ export class TicketsService {
   }
 
   getTicket(ticketId: number): Observable<Ticket> {
-    const existingTicket = this.tickets.value.find(t => t.id === ticketId)
+    const existingTicket = this.tickets.value.find(t => t.id == ticketId)
 
     return existingTicket
       ? of(existingTicket)
@@ -87,4 +91,7 @@ export class TicketsService {
     );
   }
 
+  bulkAddMessage(ticketIds: number[], message: Pick<Message, "text" | "senderType" | "senderId">) {
+    return this.http.post<ApiBatchUpdateRes>(`${this.baseUrl}/tickets/bulk/messages`, { ...message, ticketIds });
+  }
 }

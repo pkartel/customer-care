@@ -12,11 +12,13 @@
         <app-ticket-summary *ngFor="let item of bulk.selectedTickets$ | async"
           [ticket]="item" 
           (onTicketResolve)="closeTicket($event)">
+          <div>Message preview could be displayed here</div>
         </app-ticket-summary>
       </div>
     </ng-container>
   </div>
   <app-message-input
+    [disabled]="!(bulk.selectedTickets$ | async)?.length"
     (onMessageSubmit)="sendMessage($event)"
   ></app-message-input>
 </div>

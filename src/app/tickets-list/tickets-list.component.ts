@@ -1,9 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TicketsService } from '../api/tickets.service';
 import { Ticket } from '../api/types';
-import { concat, map, Observable, race, switchMap, take } from 'rxjs';
+import { concat, map, Observable, switchMap, take, tap } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
-import { BulkTicketsService } from '../api/bulk-tickets.service';
+import { BulkTicketsService } from '../bulk-tickets/bulk-tickets.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 type ItemList = Ticket & {}
 
@@ -20,8 +21,10 @@ export class TicketsListComponent implements OnInit {
 
   constructor(
     private api: TicketsService,
-    private bulk: BulkTicketsService,
+    public bulk: BulkTicketsService,
     private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -39,7 +42,35 @@ export class TicketsListComponent implements OnInit {
     );
   }
 
-  onTicketSelectChange(ticket: Ticket) {
+  trackByTicketId(index: number, item: Ticket) {
+    return item.id;
+  }
+
+  navigateToTicket(item: Ticket, e: Event) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const isSelectBoxClicked = (e.target as HTMLElement).tagName == 'INPUT'
+
+    this.bulk.selectedTickets$.pipe(
+      take(1),
+      tap(selectedTickets => {
+        if (selectedTickets?.length && !isSelectBoxClicked) {
+          this.bulk.updateSelectedTickets([])
+        }
+      })
+    ).subscribe(
+      selectedTickets => {
+        if (!selectedTickets?.length || !isSelectBoxClicked) {
+          this.router.navigate(['tickets', item.id.toString()], { relativeTo: this.route })
+        } else if (selectedTickets?.length) {
+          this.router.navigate(['tickets', 'bulk'], { relativeTo: this.route })
+        }
+      }
+    )
+  }
+
+  onTicketSelectChange(ticket: Ticket, event: any) {
     this.bulk.selectedTickets$.pipe(
       take(1),
       map((currentSelection: Ticket[]) => {
@@ -53,7 +84,23 @@ export class TicketsListComponent implements OnInit {
     });
   }
 
+  selectAllToggle(event: Event) {
+    this.bulk.selectedTickets$.pipe(
+      take(1)
+    ).subscribe(selectedTickets => {
+      if (selectedTickets.length) {
+        this.bulk.updateSelectedTickets([])
+        this.router.navigate(['home'])
+      } else {
+        this.tickets.subscribe(tickets => {
+          this.bulk.updateSelectedTickets(tickets.filter(t => t.status === 'unresolved'))
+          this.router.navigate(['tickets', 'bulk'], { relativeTo: this.route })
+        })
+      }
+    })
+  }
+
   isTicketBulkSelected(ticket: Ticket): Observable<boolean> {
-    return this.bulk.selectedTickets$.pipe(map(v => v.some(t => t.id === ticket.id)))
+    return this.bulk.selectedTickets$.pipe(map(v => v.some(t => t.id == ticket.id)))
   }
 }

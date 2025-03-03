@@ -1,4 +1,5 @@
-<!-- how would you distinguish between customer and operator and how would you structure the component (logic and html) -->
+<!-- Extracted ticket header and messaging functionality to separate components as they are reused by both single ticket and bulk view. -->
+<!-- Ideally would also make sep component for all the messages and use websockets for life updates  -->
 <div id="container">
   <app-ticket-summary [ticket]="(ticket$ | async)" (onTicketResolve)="closeTicket($event)"></app-ticket-summary>
   <mat-divider></mat-divider>

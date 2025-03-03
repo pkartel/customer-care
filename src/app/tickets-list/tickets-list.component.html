@@ -11,23 +11,31 @@
   </div>
   <div id="tickets">
     <mat-nav-list>
-      <mat-list-item *ngFor="let item of tickets | async" routerLinkActive="active-link"
-        [routerLink]="(isTicketBulkSelected(item) | async) ? ['tickets', 'bulk'] : ['tickets', item.id]"
+      <mat-list-item *ngFor="let item of tickets | async; trackBy: trackByTicketId" routerLinkActive="active-link"
+        (click)="navigateToTicket(item, $event)"
         (mouseover)="hoveredTicket = item.id" (mouseleave)="hoveredTicket = null">
-        <a matListItemTitle>{{item.subject}}</a>
-        <span matListItemLine class="ticket-body">
-          {{item.status}}
-          <mat-checkbox *ngIf="item.status === 'unresolved'" 
-            [labelPosition]="'before'"
-            [ariaLabel]="'Bulk select box'"
-            [ngStyle]="{'visibility' : (isTicketBulkSelected(item) | async) || hoveredTicket === item.id ? 'visible' : 'hidden'}"
-            [checked]="isTicketBulkSelected(item) | async"
-            (change)="onTicketSelectChange(item)"
-          >
-            bulk select
-          </mat-checkbox>
-        </span>
+        <ng-container *ngTemplateOutlet="listItem; context: { item: item, isSelected: (isTicketBulkSelected(item) | async) }">
+        </ng-container>
       </mat-list-item>
     </mat-nav-list>
   </div>
+  <button mat-flat-button
+    (click)="selectAllToggle($event)">
+    {{ (bulk.selectedTickets$ | async)?.length ? 'Unselect all' : 'Select open tickets'}}</button>
 </div>
+
+<ng-template #listItem let-item="item" let-isSelected="isSelected">
+  <a matListItemTitle>{{item.subject}}</a>
+  <span matListItemLine class="ticket-body">
+    {{item.status}}
+    <mat-checkbox *ngIf="item.status === 'unresolved'" 
+      [labelPosition]="'before'"
+      [ariaLabel]="'Bulk select box'"
+      [ngStyle]="{'visibility' : isSelected || hoveredTicket === item.id ? 'visible' : 'hidden'}"
+      [checked]="isSelected"
+      (change)="onTicketSelectChange(item, $event)"
+    >
+      {{isSelected ? 'Selected' : 'Select'}}
+    </mat-checkbox>
+  </span>
+</ng-template>

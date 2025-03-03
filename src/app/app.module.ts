@@ -22,7 +22,7 @@ import { TicketNotFoundComponent } from './ticket-not-found/ticket-not-found.com
 import { ReactiveFormsModule } from '@angular/forms';
 import { MessageInputComponent } from './shared/message-input/message-input.component';
 import { MatCheckboxModule } from '@angular/material/checkbox'
-import { BulkTicketsService } from './api/bulk-tickets.service';
+import { BulkTicketsService } from './bulk-tickets/bulk-tickets.service';
 import { BulkTicketsComponent } from './bulk-tickets/bulk-tickets.component';
 import { TicketSummaryComponent } from './shared/ticket-summary/ticket-summary.component';
 

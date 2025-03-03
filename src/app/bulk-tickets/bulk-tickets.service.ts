@@ -1,7 +1,6 @@
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
-import { Ticket } from "./types";
+import { Ticket } from "../api/types";
 
 @Injectable({
     providedIn: 'root'
@@ -10,11 +9,9 @@ import { Ticket } from "./types";
     private selectedTicketsSubject = new BehaviorSubject<any[]>([])
     selectedTickets$ = this.selectedTicketsSubject.asObservable();
     
-    constructor(
-        private http: HttpClient,
-      ) { }
+    constructor() { }
 
-      updateSelectedTickets(tickets: Ticket[]): void {
-        this.selectedTicketsSubject.next(tickets);
-      }
+    updateSelectedTickets(tickets: Ticket[]): void {
+      this.selectedTicketsSubject.next(tickets);
+    }
   }
