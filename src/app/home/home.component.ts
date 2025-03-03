@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ApiNotification, NotificationsService } from '../api/notifications-service';
 
@@ -20,7 +20,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     const senderId = "operator1"
     this.notificationsApi
       .openStream(senderId)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$)
+      )
       .subscribe((data: ApiNotification) => {
         if (data) {
           const failedTickets = data.results.reduce((err: string, r) => 
@@ -28,7 +30,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           , '')
 
           const msg = `Progress ${data.progress}% ${failedTickets?.length ? 'Update failed for tickets: ' + failedTickets : ''}`
-          this.snackBar.open(msg);
+          this.snackBar.open(msg, "Close", { duration: 3000 });
         }
       });
   }
