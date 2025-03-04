@@ -11,28 +11,33 @@
   </div>
   <div id="tickets">
     <mat-nav-list>
-      <mat-list-item *ngFor="let item of tickets | async; trackBy: trackByTicketId" routerLinkActive="active-link"
+      <mat-list-item *ngFor="let item of tickets$ | async; trackBy: trackByTicketId" routerLinkActive="active-link"
         (click)="navigateToTicket(item, $event)"
         (mouseover)="hoveredTicket = item.id" (mouseleave)="hoveredTicket = null">
-        <ng-container *ngTemplateOutlet="listItem; context: { item: item, isSelected: (isTicketBulkSelected(item) | async) }">
+        <ng-container *ngTemplateOutlet="listItem; context: {
+          $implicit: item,
+          item: item,
+          isSelected: selectedTicketsForm.get('ticket-' + item.id)?.value,
+        }">
         </ng-container>
       </mat-list-item>
     </mat-nav-list>
   </div>
   <button mat-flat-button
-    (click)="selectAllToggle($event)">
-    {{ (bulk.selectedTickets$ | async)?.length ? 'Unselect all' : 'Select open tickets'}}</button>
+    (click)="selectAllToggle()">
+    {{ (bulk.selectedTickets$ | async)?.length ? 'Unselect all' : 'Select open'}}</button>
 </div>
 
-<ng-template #listItem let-item="item" let-isSelected="isSelected">
+<ng-template #listItem let-item let-isSelected="isSelected">
   <a matListItemTitle>{{item.subject}}</a>
-  <span matListItemLine class="ticket-body">
+  <span matListItemLine class="ticket-body"
+    [formGroup]="selectedTicketsForm">
     {{item.status}}
     <mat-checkbox *ngIf="item.status === 'unresolved'" 
       [labelPosition]="'before'"
       [ariaLabel]="'Bulk select box'"
       [ngStyle]="{'visibility' : isSelected || hoveredTicket === item.id ? 'visible' : 'hidden'}"
-      [checked]="isSelected"
+      [formControlName]="'ticket-' + item.id"
       (change)="onTicketSelectChange(item, $event)"
     >
       {{isSelected ? 'Selected' : 'Select'}}

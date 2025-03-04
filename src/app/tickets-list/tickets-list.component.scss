@@ -28,6 +28,8 @@
   position: relative;
 
   mat-checkbox {
+    display: flex;
+    align-items: center;
     position: absolute;
     right: 0;
 
